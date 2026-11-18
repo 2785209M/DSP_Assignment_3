@@ -3,6 +3,7 @@ Im just adding this file to scribble down some of the ideas/gameplan for this as
 I guess first things first is just a simple high pass filter to filter out any tremors in the signal.
 This should be fairly straightforward with an IIR filter using high level design commands like butterworth
 which directly return the IIR coefficients that we need.
+Also gravity I think gets filtered out that's pretty cool!
 
 The assignment requires testing and benchmarking of atleast 2 two approaches of the IIR class.
 These will be atleast Direct form 1 and Direct form 2 IIR implementations which are shown in the lectures.
