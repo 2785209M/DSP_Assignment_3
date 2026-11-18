@@ -6,7 +6,7 @@ which directly return the IIR coefficients that we need.
 
 The assignment requires testing and benchmarking of atleast 2 two approaches of the IIR class.
 These will be atleast Direct form 1 and Direct form 2 IIR implementations which are shown in the lectures.
-The IIR_filter_2.py which i wrote is direct form 1. Direct form 2 is just as simple to implement but uses two
+The IIR_filter_2.py which i wrote is direct form 2. Direct form 1 is just as simple to implement but uses two
 delay lines and so takes up more memory and will probably be slower.
 
 Following this we would like to use the x and y acceleration measurements to move the mouse.
