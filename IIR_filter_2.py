@@ -15,4 +15,3 @@ class IIR_filter:
         self.buffer2 = self.buffer1
         self.buffer1 = acc_input
         return acc_output
-    

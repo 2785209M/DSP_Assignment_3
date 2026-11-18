@@ -1,0 +1,27 @@
+Im just adding this file to scribble down some of the ideas/gameplan for this assignment
+
+I guess first things first is just a simple high pass filter to filter out any tremors in the signal.
+This should be fairly straightforward with an IIR filter using high level design commands like butterworth
+which directly return the IIR coefficients that we need.
+
+The assignment requires testing and benchmarking of atleast 2 two approaches of the IIR class.
+These will be atleast Direct form 1 and Direct form 2 IIR implementations which are shown in the lectures.
+The IIR_filter_2.py which i wrote is direct form 1. Direct form 2 is just as simple to implement but uses two
+delay lines and so takes up more memory and will probably be slower.
+
+Following this we would like to use the x and y acceleration measurements to move the mouse.
+Python has a libary for this called mouse which looks pretty promising for this.
+
+Next step would probably be a left click. Again python mouse library has a nice command for this but challenge
+lies in detection of the gesture we will use for this:
+Approach 1: would be to just to threshold detection on the z axis and just click by lifting the hand but this is kinda boring
+and doesnt involve anymore filtering.
+
+Approach 2: would be to use an IIR matched filter. For this method we would record the signals of our designated hand gesture.
+In order to create a matched filter with an IIR filter, the impulse response of the IIR filter has to basically be the time reversed
+signal that you want to detect. I came across a nice matlab function called prony (prony's method) which basically takes a signal and approximates it as 
+a series of exponentials which would tell us the filter coefficients that we need to generate this impulse reponse. Pretty cool and I think
+this is quite promising. From their it's the same as FIR with output detection, square the signal to improve SNR and then set a threshold value
+this could be for one axis or even combine all three axes into one detection system for more complex gestures. Im not sure how hard/complicated
+this would get.
+
