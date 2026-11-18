@@ -12,8 +12,7 @@ class IIR_filter_1:
         self.bufferY2 = 0
 
     def filter(self, x):
-        acc_input = x * self.b0 + self.bufferX1 * self.b1 + self.bufferX2 * self.b2
-        acc_output = acc_input + self.bufferY1 * self.a1 + self.bufferY2 * self.a2
+        acc_output = x * self.b0 + self.bufferX1 * self.b1 + self.bufferX2 * self.b2 - self.bufferY1 * self.a1 - self.bufferY2 * self.a2
         self.bufferX2 = self.bufferX1
         self.bufferX1 = x
         self.bufferY2 = self.bufferY1
