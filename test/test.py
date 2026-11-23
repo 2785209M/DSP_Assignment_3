@@ -7,17 +7,18 @@ tsv = np.loadtxt("James_ecg_1.tsv", delimiter="\t")
 ecg_signal = tsv[:, 8].copy()
 num_samples = len(ecg_signal)
 
-fs = 200
+fs = 250
 fc = 50 # 50hz noise
 fpython = fc / fs * 2 #Normalised to Nyquist
 
-b, a = signal.butter(1, fpython)
-sos = signal.butter(1, fpython, output = 'sos')
+b, a = signal.butter(2, fpython, btype='low')
+sos = signal.butter(2, fpython, output = 'sos')
 
 print(b)
 print(a)
+print(sos)
 
-mainsFilter = iir2(0.5, 0.5, 1, 0, 0)
+mainsFilter = iir2(b[0], b[1], a[0], a[1], a[2])
 
 filtered_ecg_signal = np.zeros(num_samples)
 for i in range(num_samples):
@@ -25,12 +26,12 @@ for i in range(num_samples):
 
 plt.figure()
 plt.title("unfiltered signal")
-plt.plot(ecg_signal[0:1000])
+plt.plot(ecg_signal[0:500])
 plt.savefig("unfilteredtest.svg")
 
 plt.figure()
 plt.title("filtered signal")
-plt.plot(filtered_ecg_signal[0:1000])
+plt.plot(filtered_ecg_signal[0:500])
 plt.savefig("filter_test.svg")
 
 
