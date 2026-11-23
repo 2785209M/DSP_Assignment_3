@@ -3,6 +3,7 @@ from pyfirmata2 import Arduino
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from IIR_filter_2 import IIR_filter_2 as iir2
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
