@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-
 from pyfirmata2 import Arduino
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from IIR_filter_2 import IIR_filter_2 as iir2
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -45,7 +45,7 @@ class RealtimePlotWindow:
         self.ringbuffer = []
         # set the new 500 points of channel 9
         self.line.set_ydata(self.plotbuffer)
-        return self.line,
+        return self.line
 
     # appends data to the ringbuffer
     def addData(self, v):
@@ -67,7 +67,8 @@ def callBack(data):
     realtimePlotWindow.addData(data)
 
 # Get the Ardunio board.
-board = Arduino(PORT)
+#board = Arduino(PORT)
+board = Arduino('COM4')
 
 # Set the sampling rate in the Arduino
 board.samplingOn(1000 / samplingRate)
