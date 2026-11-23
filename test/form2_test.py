@@ -8,7 +8,7 @@ ecg_signal = tsv[:, 8].copy()
 num_samples = len(ecg_signal)
 
 fs = 250
-fc = 30 # 50hz noise
+fc = 50 # 50hz noise
 fpython = fc / fs * 2 #Normalised to Nyquist
 
 b, a = signal.butter(2, fpython)
@@ -18,7 +18,7 @@ print(b)
 print(a)
 print(sos)
 
-mainsFilter = iir2(b[0], b[1], a[0], a[1], a[2])
+mainsFilter = iir2(b[0], b[1], b[2], a[1], a[2])
 
 filtered_ecg_signal = np.zeros(num_samples)
 for i in range(num_samples):
