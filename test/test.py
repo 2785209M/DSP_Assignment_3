@@ -8,10 +8,10 @@ ecg_signal = tsv[:, 8].copy()
 num_samples = len(ecg_signal)
 
 fs = 250
-fc = 50 # 50hz noise
+fc = 30 # 50hz noise
 fpython = fc / fs * 2 #Normalised to Nyquist
 
-b, a = signal.butter(2, fpython, btype='low')
+b, a = signal.butter(2, fpython)
 sos = signal.butter(2, fpython, output = 'sos')
 
 print(b)
