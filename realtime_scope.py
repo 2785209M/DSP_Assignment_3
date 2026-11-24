@@ -77,10 +77,10 @@ def onKeyPress(event):
 
 realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
-# sampling rate: 100Hz
+# sampling rate: 200Hz
 samplingRate = 200
 
-#Create filters 
+# Create filters
 fs = samplingRate
 fc = [0.5, 7] # 50hz noise
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
