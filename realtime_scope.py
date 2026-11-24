@@ -85,7 +85,7 @@ fs = samplingRate
 fc = [0.5, 7] # 50hz noise
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
-sos = signal.butter(4, fpython, btype = 'bandpass', output = 'sos')
+sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
 
 print(sos)
 
@@ -101,8 +101,6 @@ def callBack(data):
     for f in bandpassFilterStructures:
         data = f.filter(data)
     realtimePlotWindowFiltered.addData(data)
-
-
 
 # Get the Ardunio board.
 board = Arduino(PORT)
