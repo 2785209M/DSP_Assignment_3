@@ -21,7 +21,7 @@ PORT = Arduino.AUTODETECT
 # Creates a scrolling data display
 class RealtimePlotWindow:
 
-    def __init__(self, axisLimits):
+    def __init__(self, axisLimits, title="Signal"):
         # create a plot window
         self.fig, self.ax = plt.subplots()
         # that's our plotbuffer
@@ -53,11 +53,29 @@ class RealtimePlotWindow:
     def addData(self, v):
         self.ringbuffer.append(v)
 
+    # saves the last n_samples (default 150 = 0.75s at 200Hz) from plotbuffer
+    def saveSegment(self, n_samples=500, filename="ppg_template.npy"):
+        # Flush any pending ringbuffer samples first so we have the newest data
+        if self.ringbuffer:
+            self.plotbuffer = np.append(self.plotbuffer, self.ringbuffer)[-500:]
+            self.ringbuffer = []
+        segment = self.plotbuffer[-n_samples:].copy()
+        np.save(filename, segment)
+        np.savetxt(filename.replace(".npy", ".csv"), segment, delimiter=",")
+        print(f"Saved {len(segment)} samples to {filename} and .csv")
+
 
 # Create an instance of an animated scrolling window
 # To plot more channels just create more instances and add callback handlers below
-realtimePlotWindow = RealtimePlotWindow([0, 1])
-realtimePlotWindowFiltered = RealtimePlotWindow([-0.5, 0.5])
+realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
+realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+
+def onKeyPress(event):
+    if event.key == "s":
+        # Save last 160 samples (~0.8s at 200Hz) of filtered data
+        realtimePlotWindowFiltered.saveSegment(n_samples=500, filename="ppg_template.npy")
+
+realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
 # sampling rate: 100Hz
 samplingRate = 200
