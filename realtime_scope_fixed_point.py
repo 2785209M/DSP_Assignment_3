@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import signal
-from test.IIR_form1 import IIR_filter_1 as iir1
+from test.IIR_form1 import IIR_form1 as iir1
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -89,9 +89,13 @@ sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
 
 print(sos)
 
+Q = 29
+SCALE = 1 << Q
 
+sos_q = np.round(sos * SCALE).astype(np.int64)
 bandpassFilterStructures = [
-    iir1(row[0], row[1], row[2], row[4], row[5]) for row in sos
+    iir1(int(row[0]), int(row[1]), int(row[2]), int(row[4]), int(row[5]), Q)
+    for row in sos_q
 ]
 
 
@@ -101,9 +105,10 @@ def callBack(data):
     realtimePlotWindow.addData(data)
 
     # add any filtering here:
+    val = int(round(data * SCALE))
     for f in bandpassFilterStructures:
         val = f.filter(val)
-    realtimePlotWindowFiltered.addData(val)
+    realtimePlotWindowFiltered.addData(val / SCALE)
 
 # Get the Ardunio board.
 board = Arduino(PORT)
