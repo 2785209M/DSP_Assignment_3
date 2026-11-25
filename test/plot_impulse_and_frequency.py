@@ -18,9 +18,9 @@ bandpassFilterStructures = [
 
 BandPassFilter = iir2_chain(bandpassFilterStructures)
 
-x = BandPassFilter.getImpulseResponse()
+x = BandPassFilter.getImpulseResponse(fs)
 
-y = BandPassFilter.getFrequencyResponse()
+y = BandPassFilter.getFrequencyResponse(fs)
 
 plt.figure()
 plt.title("impulse response")

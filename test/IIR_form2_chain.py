@@ -10,11 +10,14 @@ class IIR_form2_chain:
             x = f.filter(x)
         return x
 
-    def getImpulseResponse(self, num_samples=2000):
+    def getImpulseResponse(self, fs):
         #Clear the existing buffers
         for f in self.SecondOrderFilters:
             f.buffer1 = 0
             f.buffer2 = 0
+
+        #Ensure num_samples is long enough to get good resolution
+        num_samples = fs * 10
 
         #Define the impulse
         impulse = np.zeros(num_samples)
@@ -31,9 +34,9 @@ class IIR_form2_chain:
 
         return impulseResponse
 
-    def getFrequencyResponse(self):
+    def getFrequencyResponse(self, fs):
         #Get the impulse response
-        impulseResponse = self.getImpulseResponse()
+        impulseResponse = self.getImpulseResponse(fs)
 
         #Take the fourier transform of the impulse response
         frequencyResponse = np.abs(np.fft.fft(impulseResponse))
