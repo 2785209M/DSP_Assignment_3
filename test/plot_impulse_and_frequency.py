@@ -3,12 +3,8 @@ import numpy as np
 from IIR_filter_2 import IIR_filter_2 as iir2
 from scipy import signal
 
-tsv = np.loadtxt("James_ecg_1.tsv", delimiter="\t")
-ecg_signal = tsv[:, 8].copy()
-num_samples = len(ecg_signal)
-
 fs = 200
-fc = [0.5, 7] # 50hz noise
+fc = [0.5, 7] 
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
 sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
