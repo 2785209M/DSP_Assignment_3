@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import signal
-from IIR_filter_2 import IIR_filter_2 as iir2
+from test.IIR_filter_2 import IIR_filter_2 as iir2
 from test.IIR_form2_chain import IIR_form2_chain as iir2_chain
 
 # Realtime oscilloscope at a sampling rate of 100Hz
