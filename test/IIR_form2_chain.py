@@ -32,14 +32,23 @@ class IIR_form2_chain:
                 impulseResponse[i] = f.filter(impulse[i])
                 impulse = impulseResponse
 
-        return impulseResponse
+
+        #Create a time axis to return for plotting
+        timeAxis = np.linspace(0, 10, num_samples)
+
+        return impulseResponse, timeAxis
 
     def getFrequencyResponse(self, fs):
         #Get the impulse response
-        impulseResponse = self.getImpulseResponse(fs)
+        impulseResponse, tx = self.getImpulseResponse(fs)
+
+        num_samples = fs * 10
 
         #Take the fourier transform of the impulse response
         frequencyResponse = np.abs(np.fft.fft(impulseResponse))
 
-        return frequencyResponse
+        #Create a frequency axis to return for plotting
+        frequencyAxis = np.linspace(0, fs, num_samples)
+
+        return frequencyResponse, frequencyAxis
 

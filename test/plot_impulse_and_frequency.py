@@ -18,18 +18,18 @@ bandpassFilterStructures = [
 
 BandPassFilter = iir2_chain(bandpassFilterStructures)
 
-x = BandPassFilter.getImpulseResponse(fs)
+x, tx = BandPassFilter.getImpulseResponse(fs)
 
-y = BandPassFilter.getFrequencyResponse(fs)
+y, fy = BandPassFilter.getFrequencyResponse(fs)
 
 plt.figure()
 plt.title("impulse response")
-plt.plot(x)
+plt.plot(tx, x)
 plt.show()
 
 plt.figure()
 plt.title("frequency response")
-plt.plot(y)
+plt.plot(fy, y)
 plt.show()
 
 
