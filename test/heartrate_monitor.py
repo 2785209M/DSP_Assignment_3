@@ -23,7 +23,7 @@ class Heartrate_Monitor:
         if self.cooldown == 0 and self.p0 < self.p1 > self.p2:
 
             #calculate heartrate
-            self.heartrate = 60.0 * self.fs / self.indexCounter
+            self.heartrate = int(60.0 * self.fs / self.indexCounter)
 
             #reset index counter
             self.indexCounter = 0
