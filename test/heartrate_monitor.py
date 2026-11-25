@@ -21,13 +21,15 @@ class Heartrate_Monitor:
 
         #if p0 < p1 > p2 then p1 is a local maximum (peak)
         if self.cooldown == 0 and self.p0 < self.p1 > self.p2:
-            self.heartrate = self.indexCounter / self.fs
+
+            #calculate heartrate
+            self.heartrate = 60.0 * self.fs / self.indexCounter
 
             #reset index counter
             self.indexCounter = 0
 
             #cooldown limits heartrate to 220bpm for fs
-            self.cooldown = self.fs / (220 / 60)
+            self.cooldown = int(self.fs / (220 / 60))
 
             return self.heartrate
 
