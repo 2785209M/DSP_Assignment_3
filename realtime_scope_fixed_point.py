@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import signal
-from IIR_filter_2 import IIR_filter_2 as iir2
+from IIR_filter_1 import IIR_filter_1 as iir1
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -68,7 +68,7 @@ class RealtimePlotWindow:
 # Create an instance of an animated scrolling window
 # To plot more channels just create more instances and add callback handlers below
 realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
-realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 1], title = "PPG bandpass filtered 0.5-7Hz")
 
 def onKeyPress(event):
     if event.key == "s":
@@ -86,22 +86,24 @@ fc = [0.5, 7] # 50hz noise
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
 sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
-sos = np.int16(sos * 10000)
 
 print(sos)
 
+
 bandpassFilterStructures = [
-    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
+    iir1(row[0], row[1], row[2], row[4], row[5]) for row in sos
 ]
+
 
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
     # send the sample to the plotwindow
     realtimePlotWindow.addData(data)
+
     # add any filtering here:
     for f in bandpassFilterStructures:
-        data = f.filter(data)
-    realtimePlotWindowFiltered.addData(data)
+        val = f.filter(val)
+    realtimePlotWindowFiltered.addData(val)
 
 # Get the Ardunio board.
 board = Arduino(PORT)

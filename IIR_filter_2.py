@@ -1,3 +1,5 @@
+import numpy as np
+
 # IIR Filter class Direct form 2
 class IIR_filter_2:
     def __init__(self, b0, b1, b2, a1, a2):
@@ -15,3 +17,16 @@ class IIR_filter_2:
         self.buffer2 = self.buffer1
         self.buffer1 = acc_input
         return acc_output
+
+    def testImpulseResponse(self):
+        self.buffer1 = 0
+        self.buffer2 = 0
+        
+        data = np.zeros(100)
+        data[0] = 1
+        num_samples = len(data)
+        h = np.zeros(num_samples)
+        for i in range(num_samples):
+            h[i] = self.filter(data[i])
+
+        return h
