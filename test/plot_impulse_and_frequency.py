@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from IIR_filter_2 import IIR_filter_2 as iir2
-from IIR_filter_1 import IIR_filter_1 as iir1
+from IIR_form2 import IIR_form2 as iir2
+from IIR_form1 import IIR_form1 as iir1
 from scipy import signal
 from IIR_form2_chain import IIR_form2_chain as iir2_chain
 from IIR_form1_chain import IIR_form1_chain as iir1_chain

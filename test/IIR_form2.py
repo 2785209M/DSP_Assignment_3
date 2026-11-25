@@ -1,7 +1,5 @@
-import numpy as np
-
 # IIR Filter class Direct form 2
-class IIR_filter_2:
+class IIR_form2:
     def __init__(self, b0, b1, b2, a1, a2):
         self.b0 = b0
         self.b1 = b1

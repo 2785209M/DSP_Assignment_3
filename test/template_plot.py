@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from IIR_filter_2 import IIR_filter_2 as iir2
+from test.IIR_form2 import IIR_filter_2 as iir2
 from scipy import signal
 
 csv = np.loadtxt("ppg_template.csv", delimiter=",")

@@ -1,5 +1,5 @@
 # IIR filter class Direct Form 1
-class IIR_filter_1:
+class IIR_form1:
     def __init__(self, b0, b1, b2, a1, a2):
         self.b0 = b0
         self.b1 = b1
