@@ -38,7 +38,6 @@ y, fy = BandPassFilter.getFrequencyResponse(fs)
 plt.figure()
 plt.title("impulse response")
 plt.plot(tx, x)
-plt.show()
 
 plt.figure()
 plt.title("frequency response")

@@ -1,5 +1,5 @@
 import numpy as np
-from IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
+from test.IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
 
 class IIR_chain:
     def __init__(self, secondOrderFilters):
@@ -20,7 +20,7 @@ class IIR_chain:
         num_samples = fs * 5
 
         #Define the impulse and impulse response as int if for fixedpoint and float otherwise
-        if self.SecondOrderFilters and isinstance(self.SecondOrderFilters[0], iirFixedPoint):
+        if isinstance(self.SecondOrderFilters[0], iirFixedPoint):
             impulse = np.zeros(num_samples, dtype=np.int64)
             impulse[0] = 1 << self.SecondOrderFilters[0].Q
             impulseResponse = np.zeros(num_samples, dtype=np.int64)

@@ -71,6 +71,7 @@ class RealtimePlotWindow:
 # To plot more channels just create more instances and add callback handlers below
 realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
 realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate")
 
 def onKeyPress(event):
     if event.key == "s":
@@ -79,8 +80,8 @@ def onKeyPress(event):
 
 realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
-# sampling rate: 200Hz
-samplingRate = 200
+# sampling rate: 150Hz
+samplingRate = 150
 
 # Define Filters
 fs = samplingRate
@@ -116,8 +117,6 @@ LowPassFilter = iir_chain(lowpassFilterStructures)
 #Instantiate heartrate monitor
 monitor = Heartrate_Monitor(fs)
 
-currentHeartrate = 0
-
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
     #I think we can just start a timer here?
@@ -129,11 +128,10 @@ def callBack(data):
     realtimePlotWindowFiltered.addData(data)
 
     data = LowPassFilter.filter(data)
-    newHeartrate = monitor.getHeartrate(data)
+    realtimePlotWindowheartrate.addData(data)
 
-    if newHeartrate != currentHeartrate:
-        print(newHeartrate)
-        currentHeartrate = newHeartrate
+    #heartrate = monitor.getHeartrate(data)
+    #print(heartrate)
 
     #And end the timer here? then compare it against 1/fs
 
