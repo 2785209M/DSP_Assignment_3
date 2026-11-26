@@ -130,11 +130,10 @@ def callBack(data):
     data = LowPassFilter.filter(data)
     realtimePlotWindowheartrate.addData(data)
 
-    #heartrate = monitor.getHeartrate(data)
-    #print(heartrate)
+    heartrate = monitor.getHeartrate(data)
+    print(heartrate)
 
     #And end the timer here? then compare it against 1/fs
-
 
 # Get the Ardunio board.
 board = Arduino(PORT)
