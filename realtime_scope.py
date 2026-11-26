@@ -120,6 +120,8 @@ currentHeartrate = 0
 
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
+    #I think we can just start a timer here?
+
     # send the sample to the plotwindow
     realtimePlotWindow.addData(data)
     # add any filtering here:
@@ -128,10 +130,12 @@ def callBack(data):
 
     data = LowPassFilter.filter(data)
     newHeartrate = monitor.getHeartrate(data)
-    
+
     if newHeartrate != currentHeartrate:
         print(newHeartrate)
         currentHeartrate = newHeartrate
+
+    #And end the timer here? then compare it against 1/fs
 
 
 # Get the Ardunio board.
