@@ -14,7 +14,7 @@ sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
 
 print(sos)
 
-#Just between iir1 to iir2 below and when defining the filter chain to test the responses from either form
+#need to comments out all below and uncomment the other initialisation of bandpassFilterStructures for floating point forms
 
 Q = 29
 SCALE = 1 << Q
@@ -24,6 +24,10 @@ bandpassFilterStructures = [
     iir1Fixedpoint(int(row[0]), int(row[1]), int(row[2]), int(row[4]), int(row[5]), Q)
     for row in sos_q
 ]
+
+#bandpassFilterStructures = [
+#    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
+#]
 
 BandPassFilter = iir_chain(bandpassFilterStructures)
 
