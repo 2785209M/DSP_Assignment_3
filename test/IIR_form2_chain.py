@@ -13,8 +13,7 @@ class IIR_form2_chain:
     def getImpulseResponse(self, fs):
         #Clear the existing buffers
         for f in self.SecondOrderFilters:
-            f.buffer1 = 0
-            f.buffer2 = 0
+            f.clearBuffers()
 
         #Ensure num_samples is long enough to get good resolution
         num_samples = fs * 10

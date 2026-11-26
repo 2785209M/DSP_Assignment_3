@@ -27,3 +27,9 @@ class IIR_form1:
         self.bufferY2 = self.bufferY1
         self.bufferY1 = y
         return y
+
+    def clearBuffers(self):
+        self.bufferX1 = 0
+        self.bufferX2 = 0
+        self.bufferY1 = 0
+        self.bufferY2 = 0

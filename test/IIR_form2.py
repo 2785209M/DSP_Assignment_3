@@ -15,3 +15,7 @@ class IIR_form2:
         self.buffer2 = self.buffer1
         self.buffer1 = acc_input
         return acc_output
+
+    def clearBuffers(self):
+        self.buffer1 = 0
+        self.buffer2 = 0

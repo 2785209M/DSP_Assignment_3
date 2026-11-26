@@ -3,8 +3,7 @@ import numpy as np
 from IIR_form2 import IIR_form2 as iir2
 from IIR_form1 import IIR_form1 as iir1
 from scipy import signal
-from IIR_form2_chain import IIR_form2_chain as iir2_chain
-from IIR_form1_chain import IIR_form1_chain as iir1_chain
+from IIR_form2_chain import IIR_form2_chain as iir_chain
 
 fs = 200
 fc = [0.5, 7] 
@@ -17,10 +16,10 @@ print(sos)
 #Just between iir1 to iir2 below and when defining the filter chain to test the responses from either form
 
 bandpassFilterStructures = [
-    iir1(row[0], row[1], row[2], row[4], row[5]) for row in sos
+    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
 ]
 
-BandPassFilter = iir1_chain(bandpassFilterStructures)
+BandPassFilter = iir_chain(bandpassFilterStructures)
 
 x, tx = BandPassFilter.getImpulseResponse(fs)
 
