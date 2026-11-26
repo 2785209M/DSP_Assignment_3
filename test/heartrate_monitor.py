@@ -1,8 +1,7 @@
 class Heartrate_Monitor:
     def __init__(self, fs):
-        self.p0 = 0
-        self.p1 = 0
-        self.p2 = 0
+        self.hipass = 0
+        self.lopass = 0
         self.cooldown = 0
         self.indexCounter = 0
         self.heartrate = 0
@@ -11,8 +10,8 @@ class Heartrate_Monitor:
     def getHeartrate(self, x, y):
         #Add the new sample
         #I considered a buffer here but with length 3 I'm not sure it's worth the overhead?
-        self.hipass = self.x
-        self.lopass = self.y
+        self.hipass = x
+        self.lopass = y
 
         #Decrement counter by 1 every sample
         if self.cooldown > 0:

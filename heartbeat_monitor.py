@@ -69,10 +69,10 @@ class RealtimePlotWindow:
 
 # Create an instance of an animated scrolling window
 # To plot more channels just create more instances and add callback handlers below
-# realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
+realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
 realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
-# realtimePlotWindowLowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG lopass filtered 0-2Hz")
-# realtimePlotWindowHighFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 5+Hz")
+realtimePlotWindowLowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG lopass filtered 0-2Hz")
+realtimePlotWindowHighFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 5+Hz")
 # realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate")
 
 # def onKeyPress(event):
@@ -122,11 +122,11 @@ sosHp = signal.butter(2, fpython, btype = 'highpass', output = 'sos')
 
 print(sosHp)
 
-highpassFilterStructures = [
+hipassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosLp
 ]
 
-HighPassFilter = iir_chain(highpassFilterStructures)
+hiPassFilter = iir_chain(hipassFilterStructures)
 
 #Instantiate heartrate monitor
 monitor = Heartrate_Monitor(fs)
@@ -136,18 +136,19 @@ def callBack(data):
     #I think we can just start a timer here?
 
     # send the sample to the plotwindow
-    # realtimePlotWindow.addData(data)
+    realtimePlotWindow.addData(data)
     # add any filtering here:
     data = BandPassFilter.filter(data)
     realtimePlotWindowFiltered.addData(data)
 
     dataLow = LowPassFilter.filter(data)
-    #realtimePlotWindowLowFiltered.addData(dataLow)
+    realtimePlotWindowLowFiltered.addData(dataLow)
 
-    dataHigh = HighPassFilter.filter(data)
-    #realtimePlotWindowHighFiltered.addData(dataHigh)
+    dataHigh = hiPassFilter.filter(data)
+    #ealtimePlotWindowHighFiltered.addData(dataHigh)
 
-    monitor.getHeartrate(dataLow, dataHigh)
+    heartrate = monitor.getHeartrate(dataLow, dataHigh)
+    print(heartrate)
 
 
 # Get the Ardunio board.
