@@ -3,7 +3,7 @@ import numpy as np
 from scipy import signal
 from heartrate_monitor import Heartrate_Monitor 
 from IIR_form2 import IIR_form2 as iir2
-from test.IIR_chain import IIR_form2_chain as iir2_chain
+from IIR_chain import IIR_chain as iir_chain
 
 csv = np.loadtxt("ppg_template.csv", delimiter=",")
 ppg_signal = csv.copy()
@@ -21,7 +21,7 @@ lowpassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
 ]
 
-LowPassFilter = iir2_chain(lowpassFilterStructures)
+LowPassFilter = iir_chain(lowpassFilterStructures)
 
 filteredPpgSignal = np.zeros(num_samples)
 

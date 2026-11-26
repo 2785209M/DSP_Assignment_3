@@ -1,5 +1,5 @@
 import numpy as np
-from IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
+from test.IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
 
 class IIR_chain:
     def __init__(self, secondOrderFilters):
@@ -17,10 +17,10 @@ class IIR_chain:
             f.clearBuffers()
 
         #Ensure num_samples is long enough to get good resolution
-        num_samples = fs * 10
+        num_samples = fs * 5
 
         #Define the impulse and impulse response as int if for fixedpoint and float otherwise
-        if self.SecondOrderFilters and isinstance(self.SecondOrderFilters[0], iirFixedPoint):
+        if isinstance(self.SecondOrderFilters[0], iirFixedPoint):
             impulse = np.zeros(num_samples, dtype=np.int64)
             impulse[0] = 1 << self.SecondOrderFilters[0].Q
             impulseResponse = np.zeros(num_samples, dtype=np.int64)
@@ -41,7 +41,7 @@ class IIR_chain:
         impulseResponse = impulse
 
         #Create a time axis to return for plotting
-        timeAxis = np.linspace(0, 10, num_samples)
+        timeAxis = np.linspace(0, 5, num_samples)
 
         return impulseResponse, timeAxis
 
@@ -49,7 +49,7 @@ class IIR_chain:
         #Get the impulse response
         impulseResponse, tx = self.getImpulseResponse(fs)
 
-        num_samples = fs * 10
+        num_samples = fs * 5
 
         #Take the fourier transform of the impulse response
         frequencyResponse = np.abs(np.fft.fft(impulseResponse))

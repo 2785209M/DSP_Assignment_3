@@ -5,8 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import signal
-from test.IIR_form2 import IIR_filter_2 as iir2
-from test.IIR_chain import IIR_form2_chain as iir2_chain
+from test.IIR_form2 import IIR_form2 as iir2
+from test.IIR_chain import IIR_chain as iir_chain
+from test.heartrate_monitor import Heartrate_Monitor
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -70,6 +71,7 @@ class RealtimePlotWindow:
 # To plot more channels just create more instances and add callback handlers below
 realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
 realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate")
 
 def onKeyPress(event):
     if event.key == "s":
@@ -78,31 +80,61 @@ def onKeyPress(event):
 
 realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
-# sampling rate: 200Hz
-samplingRate = 200
+# sampling rate: 150Hz
+samplingRate = 150
 
-# Create filters
+# Define Filters
 fs = samplingRate
-fc = [0.5, 7] # 50hz noise
+
+#Bandpass Filter for PPG
+fc = [0.5, 7] 
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
-sos = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
+sosBp = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
 
-print(sos)
+print(sosBp)
 
 bandpassFilterStructures = [
-    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
+    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosBp
 ]
 
-BandPassFilter = iir2_chain(bandpassFilterStructures)
+BandPassFilter = iir_chain(bandpassFilterStructures)
+
+#Lowpass Filter to make heartbeat detection easier
+fc = 2
+fpython = fc / fs * 2 #Normalised to Nyquist
+
+sosLp = signal.butter(2, fpython, btype = 'lowpass', output = 'sos')
+
+print(sosLp)
+
+lowpassFilterStructures = [
+    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosLp
+]
+
+LowPassFilter = iir_chain(lowpassFilterStructures)
+
+#Instantiate heartrate monitor
+monitor = Heartrate_Monitor(fs)
 
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
+    #I think we can just start a timer here?
+
     # send the sample to the plotwindow
     realtimePlotWindow.addData(data)
     # add any filtering here:
     data = BandPassFilter.filter(data)
     realtimePlotWindowFiltered.addData(data)
+
+    data = LowPassFilter.filter(data)
+    realtimePlotWindowheartrate.addData(data)
+
+    #heartrate = monitor.getHeartrate(data)
+    #print(heartrate)
+
+    #And end the timer here? then compare it against 1/fs
+
 
 # Get the Ardunio board.
 board = Arduino(PORT)
