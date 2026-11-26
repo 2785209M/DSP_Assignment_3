@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from IIR_form2 import IIR_form2 as iir2
+from IIR_form1_fixedpoint import IIR_form1_fixedpoint as iir1Fixedpoint
 from IIR_form1 import IIR_form1 as iir1
 from scipy import signal
-from IIR_form2_chain import IIR_form2_chain as iir_chain
+from IIR_chain import IIR_chain as iir_chain
 
 fs = 200
 fc = [0.5, 7] 
@@ -15,8 +16,13 @@ print(sos)
 
 #Just between iir1 to iir2 below and when defining the filter chain to test the responses from either form
 
+Q = 29
+SCALE = 1 << Q
+
+sos_q = np.round(sos * SCALE).astype(np.int64)
 bandpassFilterStructures = [
-    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sos
+    iir1Fixedpoint(int(row[0]), int(row[1]), int(row[2]), int(row[4]), int(row[5]), Q)
+    for row in sos_q
 ]
 
 BandPassFilter = iir_chain(bandpassFilterStructures)

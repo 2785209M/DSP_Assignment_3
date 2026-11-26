@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from scipy import signal
-from test.IIR_form1 import IIR_form1 as iir1
+from test.IIR_form1_fixedpoint import IIR_form1_fixedpoint as iir1Fixedpoint
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -94,7 +94,7 @@ SCALE = 1 << Q
 
 sos_q = np.round(sos * SCALE).astype(np.int64)
 bandpassFilterStructures = [
-    iir1(int(row[0]), int(row[1]), int(row[2]), int(row[4]), int(row[5]), Q)
+    iir1Fixedpoint(int(row[0]), int(row[1]), int(row[2]), int(row[4]), int(row[5]), Q)
     for row in sos_q
 ]
 

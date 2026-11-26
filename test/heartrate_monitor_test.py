@@ -3,7 +3,7 @@ import numpy as np
 from scipy import signal
 from heartrate_monitor import Heartrate_Monitor 
 from IIR_form2 import IIR_form2 as iir2
-from IIR_form2_chain import IIR_form2_chain as iir2_chain
+from test.IIR_chain import IIR_form2_chain as iir2_chain
 
 csv = np.loadtxt("ppg_template.csv", delimiter=",")
 ppg_signal = csv.copy()
