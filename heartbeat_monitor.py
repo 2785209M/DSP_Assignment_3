@@ -123,7 +123,7 @@ sosHp = signal.butter(2, fpython, btype = 'highpass', output = 'sos')
 print(sosHp)
 
 hipassFilterStructures = [
-    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosLp
+    iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosHp
 ]
 
 hiPassFilter = iir_chain(hipassFilterStructures)
