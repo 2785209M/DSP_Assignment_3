@@ -122,11 +122,11 @@ sosHp = signal.butter(2, fpython, btype = 'highpass', output = 'sos')
 
 print(sosHp)
 
-hipassFilterStructures = [
+highpassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosLp
 ]
 
-hiPassFilter = iir_chain(hipassFilterStructures)
+HighPassFilter = iir_chain(highpassFilterStructures)
 
 #Instantiate heartrate monitor
 monitor = Heartrate_Monitor(fs)
@@ -144,7 +144,7 @@ def callBack(data):
     dataLow = LowPassFilter.filter(data)
     #realtimePlotWindowLowFiltered.addData(dataLow)
 
-    dataHigh = LowPassFilter.filter(data)
+    dataHigh = HighPassFilter.filter(data)
     #realtimePlotWindowHighFiltered.addData(dataHigh)
 
     monitor.getHeartrate(dataLow, dataHigh)
