@@ -89,7 +89,7 @@ samplingRate = 150
 fs = samplingRate
 
 #Bandpass Filter for PPG
-fc = [0.5, 7] 
+fc = [0.5, 10] 
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
 sosBp = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
@@ -101,7 +101,7 @@ bandpassFilterStructures = [
 BandPassFilter = iir_chain(bandpassFilterStructures)
 
 # Lopass Filter for heartbeat detection
-fc = 2
+fc = 0.5
 fpython = fc / fs * 2 #Normalised to Nyquist
 
 sosLp = signal.butter(2, fpython, btype = 'lowpass', output = 'sos')
@@ -145,7 +145,7 @@ def callBack(data):
     realtimePlotWindowLowFiltered.addData(dataLow)
 
     dataHigh = hiPassFilter.filter(data)
-    #ealtimePlotWindowHighFiltered.addData(dataHigh)
+    realtimePlotWindowHighFiltered.addData(dataHigh)
 
     heartrate = monitor.getHeartrate(dataLow, dataHigh)
     print(heartrate)
