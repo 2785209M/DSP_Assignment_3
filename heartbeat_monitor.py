@@ -147,7 +147,8 @@ def callBack(data):
     dataHigh = HighPassFilter.filter(data)
     #realtimePlotWindowHighFiltered.addData(dataHigh)
 
-    monitor.getHeartrate(dataLow, dataHigh)
+    heartrate = monitor.getHeartrate(dataLow, dataHigh)
+    print(heartrate)
 
 
 # Get the Ardunio board.
