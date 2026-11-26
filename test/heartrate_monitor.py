@@ -8,19 +8,18 @@ class Heartrate_Monitor:
         self.heartrate = 0
         self.fs = fs
 
-    def getHeartrate(self, x):
+    def getHeartrate(self, x, y):
         #Add the new sample
         #I considered a buffer here but with length 3 I'm not sure it's worth the overhead?
-        self.p0 = self.p1
-        self.p1 = self.p2
-        self.p2 = x
+        self.hipass = self.x
+        self.lopass = self.y
 
         #Decrement counter by 1 every sample
         if self.cooldown > 0:
             self.cooldown -= 1
 
         #if p0 < p1 > p2 then p1 is a local maximum (peak)
-        if self.cooldown == 0 and self.p0 < self.p1 > self.p2:
+        if self.cooldown == 0 and self.lopass < self.hipass:
 
             #calculate heartrate
             self.heartrate = int(60.0 * self.fs / self.indexCounter)
