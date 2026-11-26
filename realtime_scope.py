@@ -8,6 +8,7 @@ from scipy import signal
 from test.IIR_form2 import IIR_form2 as iir2
 from test.IIR_chain import IIR_chain as iir_chain
 from test.heartrate_monitor import Heartrate_Monitor
+import time
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -120,6 +121,7 @@ monitor = Heartrate_Monitor(fs)
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
     #I think we can just start a timer here?
+    t0 = time.perf_counter()
 
     # send the sample to the plotwindow
     realtimePlotWindow.addData(data)
@@ -131,7 +133,13 @@ def callBack(data):
     realtimePlotWindowheartrate.addData(data)
 
     heartrate = monitor.getHeartrate(data)
-    print(heartrate)
+    #print(heartrate)
+
+    t1 = time.perf_counter()
+    t = (t0 - t1)
+    print(t)
+    if t > 1/fs:
+        print("Callback routine is running slower than sampling interval")
 
     #And end the timer here? then compare it against 1/fs
 
