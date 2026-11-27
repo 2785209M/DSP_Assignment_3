@@ -7,7 +7,7 @@ import matplotlib.animation as animation
 from scipy import signal
 from test.IIR_form2 import IIR_form2 as iir2
 from test.IIR_chain import IIR_chain as iir_chain
-from test.heartrate_monitor import Heartrate_Monitor
+#from test.heartrate_monitor import Heartrate_Monitor
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -19,6 +19,37 @@ from test.heartrate_monitor import Heartrate_Monitor
 
 PORT = Arduino.AUTODETECT
 # PORT = '/dev/ttyUSB0'
+
+class Heartrate_Monitor:
+    def __init__(self, fs, peak_detection_threshold=0.06):
+        self.prev_lopass = 0
+        self.prev_hipass = 0
+        self.cooldown = 0
+        self.indexCounter = 0
+        self.heartrate = 0
+        self.fs = fs
+        self.peak_detection_threshold = peak_detection_threshold
+
+    def getHeartRate(self, lopass, hipass):
+            self.indexCounter += 1
+
+            # Rising Edge Detection
+            crossed_above = (self.prev_hipass <= self.prev_lopass) and (hipass > lopass)
+            above_threshold = hipass > self.peak_detection_threshold
+
+            if self.cooldown > 0:
+                self.cooldown -= 1
+
+            elif crossed_above and above_threshold:
+                self.heartrate = int(60.0 * self.fs / self.indexCounter)
+                self.indexCounter = 0
+                self.cooldown = int(self.fs / (220 / 60))
+                print(f"BPM: {self.heartrate}")
+
+            self.prev_lopass = lopass
+            self.prev_hipass = hipass
+
+            return self.heartrate
 
 # Creates a scrolling data display
 class RealtimePlotWindow:
@@ -32,6 +63,9 @@ class RealtimePlotWindow:
         self.line, = self.ax.plot(self.plotbuffer)
         # axis
         self.ax.set_ylim(axisLimits[0], axisLimits[1])
+        self.base_title = title
+        # initialize bpm to 0
+        self.current_bpm = 0
         # That's our ringbuffer which accumluates the samples
         # It's emptied every time when the plot window below
         # does a repaint
@@ -49,7 +83,14 @@ class RealtimePlotWindow:
         self.ringbuffer = []
         # set the new 500 points of channel 9
         self.line.set_ydata(self.plotbuffer)
+
+        # Update the title on the GUI thread
+        bpm_text = f"{self.current_bpm} BPM" if self.current_bpm > 0 else "-- BPM"
+        self.ax.set_title(f"{self.base_title} | {bpm_text}")
         return self.line,
+
+    def setBpm(self, bpm):
+        self.current_bpm = bpm
 
     # appends data to the ringbuffer
     def addData(self, v):
@@ -69,10 +110,10 @@ class RealtimePlotWindow:
 
 # Create an instance of an animated scrolling window
 # To plot more channels just create more instances and add callback handlers below
-realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
-realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+#realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
+#realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
 realtimePlotWindowLowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG lopass filtered 0-2Hz")
-realtimePlotWindowHighFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 5+Hz")
+realtimePlotWindowHighFiltered = RealtimePlotWindow([0, 0.1], title = "PPG bandpass filtered 5+Hz")
 # realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate")
 
 # def onKeyPress(event):
@@ -82,8 +123,8 @@ realtimePlotWindowHighFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG ba
 
 # realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
-# sampling rate: 150Hz
-samplingRate = 150
+# sampling rate: 100Hz
+samplingRate = 100
 
 # Define Filters
 fs = samplingRate
@@ -94,11 +135,11 @@ fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
 sosBp = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
 
-bandpassFilterStructures = [
+bandPassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosBp
 ]
 
-BandPassFilter = iir_chain(bandpassFilterStructures)
+BandPassFilter = iir_chain(bandPassFilterStructures)
 
 # Lopass Filter for heartbeat detection
 fc = 0.5
@@ -108,25 +149,25 @@ sosLp = signal.butter(2, fpython, btype = 'lowpass', output = 'sos')
 
 print(sosLp)
 
-lowpassFilterStructures = [
+lowPassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosLp
 ]
 
-LowPassFilter = iir_chain(lowpassFilterStructures)
+LowPassFilter = iir_chain(lowPassFilterStructures)
 
 # Hipass Filter for heartbeat detection
-fc = 5
+fc = 4
 fpython = fc / fs * 2 #Normalised to Nyquist
 
 sosHp = signal.butter(2, fpython, btype = 'highpass', output = 'sos')
 
 print(sosHp)
 
-hipassFilterStructures = [
+highPassFilterStructures = [
     iir2(row[0], row[1], row[2], row[4], row[5]) for row in sosHp
 ]
 
-hiPassFilter = iir_chain(hipassFilterStructures)
+HighPassFilter = iir_chain(highPassFilterStructures)
 
 #Instantiate heartrate monitor
 monitor = Heartrate_Monitor(fs)
@@ -136,19 +177,19 @@ def callBack(data):
     #I think we can just start a timer here?
 
     # send the sample to the plotwindow
-    realtimePlotWindow.addData(data)
+    #realtimePlotWindow.addData(data)
     # add any filtering here:
     data = BandPassFilter.filter(data)
-    realtimePlotWindowFiltered.addData(data)
+    #realtimePlotWindowFiltered.addData(data)
 
     dataLow = LowPassFilter.filter(data)
     realtimePlotWindowLowFiltered.addData(dataLow)
 
-    dataHigh = hiPassFilter.filter(data)
+    dataHigh = (HighPassFilter.filter(data) ** 2) * 1000
     realtimePlotWindowHighFiltered.addData(dataHigh)
 
-    heartrate = monitor.getHeartrate(dataLow, dataHigh)
-    print(heartrate)
+    heartrate = monitor.getHeartRate(dataLow, dataHigh)
+    realtimePlotWindowHighFiltered.setBpm(heartrate)
 
 
 # Get the Ardunio board.
