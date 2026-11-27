@@ -7,7 +7,6 @@ import matplotlib.animation as animation
 from scipy import signal
 from test.IIR_form2 import IIR_form2 as iir2
 from test.IIR_chain import IIR_chain as iir_chain
-#from test.heartrate_monitor import Heartrate_Monitor
 
 # Realtime oscilloscope at a sampling rate of 100Hz
 # It displays analog channel 0.
@@ -21,7 +20,7 @@ PORT = Arduino.AUTODETECT
 # PORT = '/dev/ttyUSB0'
 
 class Heartrate_Monitor:
-    def __init__(self, fs, peak_detection_threshold=0.06):
+    def __init__(self, fs, peak_detection_threshold=0.005):
         self.prev_lopass = 0
         self.prev_hipass = 0
         self.cooldown = 0
@@ -124,13 +123,11 @@ realtimePlotWindowHighFiltered = RealtimePlotWindow([0, 0.1], title = "PPG bandp
 # realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
 # sampling rate: 100Hz
-samplingRate = 100
+fs = 200
 
-# Define Filters
-fs = samplingRate
 
 #Bandpass Filter for PPG
-fc = [0.5, 10] 
+fc = [0.1, 10] 
 fpython = [fc[0] / fs * 2, fc[1] / fs * 2] #Normalised to Nyquist
 
 sosBp = signal.butter(2, fpython, btype = 'bandpass', output = 'sos')
@@ -156,7 +153,7 @@ lowPassFilterStructures = [
 LowPassFilter = iir_chain(lowPassFilterStructures)
 
 # Hipass Filter for heartbeat detection
-fc = 4
+fc = 5
 fpython = fc / fs * 2 #Normalised to Nyquist
 
 sosHp = signal.butter(2, fpython, btype = 'highpass', output = 'sos')
@@ -179,13 +176,13 @@ def callBack(data):
     # send the sample to the plotwindow
     #realtimePlotWindow.addData(data)
     # add any filtering here:
-    data = BandPassFilter.filter(data)
+    dataBand = BandPassFilter.filter(data)
     #realtimePlotWindowFiltered.addData(data)
 
-    dataLow = LowPassFilter.filter(data)
+    dataLow = LowPassFilter.filter(dataBand)
     realtimePlotWindowLowFiltered.addData(dataLow)
 
-    dataHigh = (HighPassFilter.filter(data) ** 2) * 1000
+    dataHigh = (HighPassFilter.filter(dataBand))
     realtimePlotWindowHighFiltered.addData(dataHigh)
 
     heartrate = monitor.getHeartRate(dataLow, dataHigh)
@@ -196,7 +193,7 @@ def callBack(data):
 board = Arduino(PORT)
 
 # Set the sampling rate in the Arduino
-board.samplingOn(1000 / samplingRate)
+board.samplingOn(1000 / fs)
 
 # Register the callback which adds the data to the animated plot
 board.analog[0].register_callback(callBack)

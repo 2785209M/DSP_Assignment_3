@@ -24,7 +24,7 @@ PORT = Arduino.AUTODETECT
 # Creates a scrolling data display
 class RealtimePlotWindow:
 
-    def __init__(self, axisLimits, title="Signal"):
+    def __init__(self, axisLimits, title="Signal", hasBPM = False):
         # create a plot window
         self.fig, self.ax = plt.subplots()
         # that's our plotbuffer
@@ -33,6 +33,10 @@ class RealtimePlotWindow:
         self.line, = self.ax.plot(self.plotbuffer)
         # axis
         self.ax.set_ylim(axisLimits[0], axisLimits[1])
+        self.base_title = title
+        # initialize bpm to 0
+        self.current_bpm = 0
+        self.hasBPM = hasBPM
         # That's our ringbuffer which accumluates the samples
         # It's emptied every time when the plot window below
         # does a repaint
@@ -50,7 +54,17 @@ class RealtimePlotWindow:
         self.ringbuffer = []
         # set the new 500 points of channel 9
         self.line.set_ydata(self.plotbuffer)
+
+        # Update the title on the GUI thread
+        if(self.hasBPM):
+            bpm_text = f"{self.current_bpm} BPM" if self.current_bpm > 0 else "-- BPM"
+            self.ax.set_title(f"{self.base_title} | {bpm_text}")
+        else:
+            self.ax.set_title(f"{self.base_title}")
         return self.line,
+
+    def setBpm(self, bpm):
+        self.current_bpm = bpm
 
     # appends data to the ringbuffer
     def addData(self, v):
@@ -70,9 +84,9 @@ class RealtimePlotWindow:
 
 # Create an instance of an animated scrolling window
 # To plot more channels just create more instances and add callback handlers below
-realtimePlotWindow = RealtimePlotWindow([0, 1], title="Raw PPG")
+realtimePlotWindow = RealtimePlotWindow([0, 0.5], title="Raw PPG")
 realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
-realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate")
+realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate (Lowpass)", hasBPM=True)
 
 def onKeyPress(event):
     if event.key == "s":
@@ -120,7 +134,6 @@ monitor = Heartrate_Monitor(fs)
 
 # called for every new sample which has arrived from the Arduino
 def callBack(data):
-    #I think we can just start a timer here?
     t0 = time.perf_counter()
 
     # send the sample to the plotwindow
@@ -133,15 +146,12 @@ def callBack(data):
     realtimePlotWindowheartrate.addData(data)
 
     heartrate = monitor.getHeartrate(data)
-    #print(heartrate)
+    realtimePlotWindowheartrate.setBpm(heartrate)
 
     t1 = time.perf_counter()
     t = (t1 - t0)
-    print(t)
     if t > 1/fs:
         print("Callback routine is running slower than sampling interval")
-
-    #And end the timer here? then compare it against 1/fs
 
 # Get the Ardunio board.
 board = Arduino(PORT)
