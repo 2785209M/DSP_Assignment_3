@@ -1,5 +1,5 @@
 import numpy as np
-from test.IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
+from IIR_form1_fixedpoint import IIR_form1_fixedpoint as iirFixedPoint
 
 class IIR_chain:
     def __init__(self, secondOrderFilters):
