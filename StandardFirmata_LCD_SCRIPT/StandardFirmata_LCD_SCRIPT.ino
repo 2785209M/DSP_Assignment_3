@@ -27,11 +27,10 @@
 #include <Wire.h>
 #include <Firmata.h>
 
-#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-// Change 0x3F to 0x3F if your LCD stays blank
-LiquidCrystal_I2C lcd(0x3F, 16, 2);
+// Change 0x27 to 0x3F if your LCD stays blank
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // 8 vertical bar heights (slots 0..7) for the scrolling heartrate waveform
 byte barChars[8][8] = {
@@ -815,6 +814,14 @@ void setup()
   }
 
   systemResetCallback();  // reset to default config
+
+  lcd.init();
+  lcd.backlight();
+  for (int i = 0; i < 8; i++) {
+    lcd.createChar(i, barChars[i]);
+  }
+  lcd.setCursor(0, 0);
+  lcd.print("Waiting for PPG ");
 }
 
 /*==============================================================================
@@ -858,12 +865,4 @@ void loop()
 #ifdef FIRMATA_SERIAL_FEATURE
   serialFeature.update();
 #endif
-
-  lcd.init();
-  lcd.backlight();
-  for (int i = 0; i < 8; i++) {
-    lcd.createChar(i, barChars[i]);
-  }
-  lcd.setCursor(0, 0);
-  lcd.print("Waiting for PPG ");
 }

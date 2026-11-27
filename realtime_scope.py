@@ -59,19 +59,19 @@ class RealtimePlotWindow:
             bpm_text = f"{self.current_bpm} BPM" if self.current_bpm > 0 else "-- BPM"
             self.ax.set_title(f"{self.base_title} | {bpm_text}")
 
-            # self.lcd_counter += 1
-            # if self.lcd_counter >= 5:
-            #     self.lcd_counter = 0
-            #     try:
-            #         row0 = f"0HR: {bpm_text:<12}"[:17]
-            #         board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row0))
+            self.lcd_counter += 1
+            if self.lcd_counter >= 5:
+                self.lcd_counter = 0
+                try:
+                    row0 = f"0HR: {bpm_text:<12}"[:17]
+                    board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row0))
 
-            #         recent = self.plotbuffer[-225::14][:16]
-            #         levels = np.clip(((recent + 0.1) / 0.2) * 7, 0, 7).astype(int)
-            #         row1 = "1" + "".join(str(l) for l in levels)
-            #         board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row1))
-            #     except Exception as e:
-            #         print("LCD update error:", e)
+                    recent = self.plotbuffer[-225::14][:16]
+                    levels = np.clip(((recent + 0.1) / 0.2) * 7, 0, 7).astype(int)
+                    row1 = "1" + "".join(str(l) for l in levels)
+                    board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row1))
+                except Exception as e:
+                    print("LCD update error:", e)
         else:
             self.ax.set_title(f"{self.base_title}")
         return self.line
