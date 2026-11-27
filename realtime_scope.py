@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from pyfirmata2 import Arduino
+from pyfirmata2 import Arduino, STRING_DATA, util
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -24,9 +24,10 @@ PORT = Arduino.AUTODETECT
 # Creates a scrolling data display
 class RealtimePlotWindow:
 
-    def __init__(self, axisLimits, title="Signal", hasBPM = False):
+    def __init__(self, ax, axisLimits, title="Signal", hasBPM = False):
+        self.lcd_counter = 0
         # create a plot window
-        self.fig, self.ax = plt.subplots()
+        self.ax = ax
         # that's our plotbuffer
         self.plotbuffer = np.zeros(500)
         # create an empty line
@@ -42,11 +43,9 @@ class RealtimePlotWindow:
         # does a repaint
         self.ringbuffer = []
         # add any initialisation code here (filters etc)
-        # start the animation
-        self.ani = animation.FuncAnimation(self.fig, self.update, interval=100, cache_frame_data=False)
 
     # updates the plot
-    def update(self, data):
+    def update(self):
         # add new data to the buffer
         self.plotbuffer = np.append(self.plotbuffer, self.ringbuffer)
         # only keep the 500 newest ones and discard the old ones
@@ -59,9 +58,23 @@ class RealtimePlotWindow:
         if(self.hasBPM):
             bpm_text = f"{self.current_bpm} BPM" if self.current_bpm > 0 else "-- BPM"
             self.ax.set_title(f"{self.base_title} | {bpm_text}")
+
+            # self.lcd_counter += 1
+            # if self.lcd_counter >= 5:
+            #     self.lcd_counter = 0
+            #     try:
+            #         row0 = f"0HR: {bpm_text:<12}"[:17]
+            #         board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row0))
+
+            #         recent = self.plotbuffer[-225::14][:16]
+            #         levels = np.clip(((recent + 0.1) / 0.2) * 7, 0, 7).astype(int)
+            #         row1 = "1" + "".join(str(l) for l in levels)
+            #         board.send_sysex(STRING_DATA, util.str_to_two_byte_iter(row1))
+            #     except Exception as e:
+            #         print("LCD update error:", e)
         else:
             self.ax.set_title(f"{self.base_title}")
-        return self.line,
+        return self.line
 
     def setBpm(self, bpm):
         self.current_bpm = bpm
@@ -83,17 +96,28 @@ class RealtimePlotWindow:
 
 
 # Create an instance of an animated scrolling window
+fig, axes = plt.subplots(3, 1, figsize=(10,  6), sharex = True)
+axes = np.atleast_1d(axes)
+
 # To plot more channels just create more instances and add callback handlers below
-realtimePlotWindow = RealtimePlotWindow([0, 0.5], title="Raw PPG")
-realtimePlotWindowFiltered = RealtimePlotWindow([-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
-realtimePlotWindowheartrate = RealtimePlotWindow([-0.1, 0.1], title = "heartrate (Lowpass)", hasBPM=True)
+realtimePlotWindow = RealtimePlotWindow(axes[0], [0, 0.5], title="Raw PPG")
+realtimePlotWindowFiltered = RealtimePlotWindow(axes[1], [-0.1, 0.1], title = "PPG bandpass filtered 0.5-7Hz")
+realtimePlotWindowheartrate = RealtimePlotWindow(axes[2], [-0.1, 0.1], title = "heartrate (Lowpass)", hasBPM=True)
+
+all_plots = [realtimePlotWindow, realtimePlotWindowFiltered, realtimePlotWindowheartrate]
+
+def update_all(frame):
+    return [p.update() for p in all_plots]
+
+fig.tight_layout()
+ani = animation.FuncAnimation(fig, update_all, interval=100, cache_frame_data=False)
 
 def onKeyPress(event):
     if event.key == "s":
         # Save last 160 samples (~0.8s at 200Hz) of filtered data
         realtimePlotWindowFiltered.saveSegment(n_samples=500, filename="ppg_template.npy")
 
-realtimePlotWindowFiltered.fig.canvas.mpl_connect("key_press_event", onKeyPress)
+fig.canvas.mpl_connect("key_press_event", onKeyPress)
 
 # sampling rate: 150Hz
 samplingRate = 150

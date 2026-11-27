@@ -1,30 +1,45 @@
 class Heartrate_Monitor:
-    def __init__(self, fs, peak_detection_threshold=0.005):
-        self.prev_lopass = 0
-        self.prev_hipass = 0
+    def __init__(self, fs):
+        self.p0 = 0
+        self.p1 = 0
+        self.p2 = 0
         self.cooldown = 0
         self.indexCounter = 0
         self.heartrate = 0
         self.fs = fs
-        self.peak_detection_threshold = peak_detection_threshold
 
-    def getHeartRate(self, lopass, hipass):
-            self.indexCounter += 1
+    def getHeartrate(self, x):
+        #Add the new sample
+        #I considered a buffer here but with length 3 I'm not sure it's worth the overhead?
+        self.p0 = self.p1
+        self.p1 = self.p2
+        self.p2 = x
 
-            # Rising Edge Detection
-            crossed_above = (self.prev_hipass <= self.prev_lopass) and (hipass > lopass)
-            above_threshold = hipass > self.peak_detection_threshold
+        #Decrement counter by 1 every sample
+        if self.cooldown > 0:
+            self.cooldown -= 1
 
-            if self.cooldown > 0:
-                self.cooldown -= 1
+        #if p0 < p1 > p2 then p1 is a local maximum (peak)
+        if self.cooldown == 0 and self.p0 < self.p1 > self.p2:
 
-            elif crossed_above and above_threshold:
-                self.heartrate = int(60.0 * self.fs / self.indexCounter)
-                self.indexCounter = 0
-                self.cooldown = int(self.fs / (300 / 60))
-                print(f"BPM: {self.heartrate}")
+            #calculate heartrate
+            self.heartrate = int(60.0 * self.fs / self.indexCounter)
 
-            self.prev_lopass = lopass
-            self.prev_hipass = hipass
+            #reset index counter
+            self.indexCounter = 0
+
+            #cooldown limits heartrate to 220bpm for fs
+            self.cooldown = int(self.fs / (220 / 60))
 
             return self.heartrate
+
+        else:
+            #if no peak detected then increment index counter
+            self.indexCounter += 1
+            #and return current heartrate
+            return self.heartrate
+
+
+            
+
+        
