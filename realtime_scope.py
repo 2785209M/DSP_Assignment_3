@@ -136,7 +136,7 @@ def callBack(data):
     #print(heartrate)
 
     t1 = time.perf_counter()
-    t = (t0 - t1)
+    t = (t1 - t0)
     print(t)
     if t > 1/fs:
         print("Callback routine is running slower than sampling interval")
